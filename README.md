@@ -1,13 +1,30 @@
-## Setup Pact Example
-
-This is an use case for Pact framework, that allows to do contract testing. Contract testing with Pact allows to run the tests faster than e.g., integration or system tests.
+This is a use case for Pact framework, that allows to do contract testing. Contract testing with Pact allows to run the tests faster than e.g., integration or system tests.
 
 [Pact](http://www.pact.io/)
 
+# Before Start
 
-### As A Consumer Create and Run the Contract Tests
+To install working environment for python and the project dependencies run the script
+
+    ./setup.sh
+
+and activate the venv.
+
+
+# Sample service
+
+There is a simple Python application in the app directory that has it's own API. Right now it has only one method implemented - GET. To start the application run:
+
+    python app/app.py
+
+The app will be available at http://localhost:5000/ .
+
+
+# Creating the contract tests
 
 Consumer creates a set of contract tests for HTTP API of the provider and runs them against mock service to generate JSON file - contract aka 'pact'. 
+
+## Mock Service
 
 1. [Install Pact Mock Service](https://github.com/pact-foundation/pact-mock_service)
     
@@ -17,37 +34,31 @@ Consumer creates a set of contract tests for HTTP API of the provider and runs t
 
     pact-mock-service start
 
-3. Create consumer pact tests
 
-4. Execute the tests:
+## Consumer Tests
+
+1. Execute the tests (pact-mock-service has to be started before):
 
     python -m unittest device_service_pact.py
 
-5. Notice generated json file - a contract for a provider
+2. The contract will be generated and saved in **.pacts** dir if the run is successful.
 
 
-### As A Provider Run The Contract On A Provider Service
+# Provider Checks The Contract
 
-Once json contract file is ready it must be available to a Provider as a file or via the URL. Provider runs the tests against their service based on this contract.
+## Verofy the contract
 
+The provider service has to be available on http://localhost:5000/.
 
-1. Run Test Application
-
-    There is a simple Python application app.py that has it's own API. Right now it has only one method implemented - GET. To start the application run:
-
-        python app.py 
-
-    it will be run on port: 5000
-
-2. Run the contract tests on Provider
-
-    There is a pact-verifier tool, that allows to run the contract against provider service:
+To check the contract against the provider run:
 
     pact-verifier --provider-base-url=http://localhost:5000/ --pact-url=../../pacts/frontend-translation_service.json
 
 
-### Provider State
+**pact-verifier** is installed with pact-python.
 
-	Additionally, provider can implement some states (fixture) that has to be run before the contract test. 
+##Provider State
 
-	Consumer specifies the name of the statement within a keyword 'given' and sends the json file to a provider. Once the provider gets the contract he must implement the statements before verifying that contracts. The statements must be imported in pact_helper.py file.
+Additionally, provider can implement some states (fixture) that has to be run before the contract test. 
+
+Consumer specifies the name of the state within a keyword 'given' and sends the contract to a provider. Once the provider gets the contract he must implement the state before verifying that contracts. The states must be imported in pact_helper.py file.

@@ -1,6 +1,5 @@
 import atexit
 import unittest
-import time
 import requests
 from pact import Consumer, Provider
 
@@ -35,7 +34,7 @@ class GetDeviceContract(unittest.TestCase):
          .given('for number -1 doesn\'t exist')
          .upon_receiving('a request to get translation for number minus one')
          .with_request('get', '/translate/-1')
-         .will_respond_with(404, body=''))
+         .will_respond_with(expected, body=''))
 
         with pact:
           result = requests.get('http://localhost:1234/translate/-1')
