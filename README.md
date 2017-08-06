@@ -39,7 +39,7 @@ Consumer creates a set of contract tests for HTTP API of the provider and runs t
 
 1. Execute the tests (start pact-mock-service before):
 
-    python -m unittest device_service_pact.py
+    python -m unittest contract_tests/translate_service_contract.py
 
 2. The contract will be generated and saved in **.pacts** dir if the run is successful.
 
@@ -52,7 +52,7 @@ The provider service has to be available on http://localhost:5000/.
 
 To check the contract against the provider run:
 
-    pact-verifier --provider-base-url=http://localhost:5000/ --pact-url=../../pacts/frontend-translation_service.json
+    pact-verifier --provider-base-url=http://localhost:5000/ --pact-url=../../pacts/translate_service_contract.json
 
 
 **pact-verifier** is installed with pact-python.
