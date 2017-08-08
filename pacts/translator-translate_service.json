@@ -1,0 +1,45 @@
+{
+  "consumer": {
+    "name": "Translator"
+  },
+  "provider": {
+    "name": "Translate Service"
+  },
+  "interactions": [
+    {
+      "description": "a request to get translation for number one",
+      "providerState": "translation for number 1",
+      "request": {
+        "method": "get",
+        "path": "/translate/1"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "ua": "Один",
+          "en": "One"
+        }
+      }
+    },
+    {
+      "description": "a request to get translation for number minus one",
+      "providerState": "translation for number -1 doesn't exist",
+      "request": {
+        "method": "get",
+        "path": "/translate/-1"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "1.0.0"
+    }
+  }
+}

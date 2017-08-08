@@ -6,6 +6,7 @@ from pact import Consumer, Provider
 pact = Consumer('Translator').has_pact_with(Provider('Translate Service'), pact_dir='./pacts')
 
 pact.start_service()
+
 atexit.register(pact.stop_service)
 
 
@@ -22,13 +23,12 @@ class TranslateServiceContract(unittest.TestCase):
         expected = {"en": "One", "ua": "Один"}
           
         (pact
-         .given('translation for number one')
+         .given('translation for number 1')
          .upon_receiving('a request to get translation for number one')
          .with_request('get', path)
          .will_respond_with(200, body=expected))
 
         with pact:
-          import pdb; pdb.set_trace()
           result = self._request_helper(path).json()
         
         self.assertEqual(result["en"], expected["en"])
@@ -38,10 +38,10 @@ class TranslateServiceContract(unittest.TestCase):
         expected = 404
 
         (pact
-         .given('for number -1 doesn\'t exist')
+         .given('translation for number -1 doesn\'t exist')
          .upon_receiving('a request to get translation for number minus one')
          .with_request('get', path)
-         .will_respond_with(expected, body=''))
+         .will_respond_with(expected))
 
         with pact:
           result = self._request_helper(path)
