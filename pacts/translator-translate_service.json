@@ -7,7 +7,7 @@
   },
   "interactions": [
     {
-      "description": "a request to get translation for number one",
+      "description": "a request to get translation for 1",
       "providerState": "translation for number 1",
       "request": {
         "method": "get",
@@ -18,14 +18,14 @@
         "headers": {
         },
         "body": {
-          "ua": "Один",
-          "en": "One"
+          "de": "eins",
+          "en": "one"
         }
       }
     },
     {
-      "description": "a request to get translation for number minus one",
-      "providerState": "translation for number -1 doesn't exist",
+      "description": "a request to get translation for -1",
+      "providerState": "no translation for number -1",
       "request": {
         "method": "get",
         "path": "/translate/-1"

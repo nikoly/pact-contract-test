@@ -4,7 +4,6 @@ import os
 from flask import Flask, Response, request
 from werkzeug.datastructures import Headers
 
-# constants
 
 HTTP_METHODS = ['GET', 'POST']
 
@@ -15,89 +14,73 @@ STATUS = {
 
 translations = {}
 
-app = Flask(__name__)
+# FILE WITH TRANSLATIONS
+file_path = os.path.dirname(__file__) + "/translations.json"
 
-# Application Data Store Setup
+if (os.path.getsize(file_path) == 0):
+    print(file_path + " file is empty!!!")
 
-file_translations_path = os.path.dirname(__file__) + "/translations.json"
-size = os.path.getsize(file_translations_path)
+# APPLICATION HELPERS
 
-if (size > 0):
-    with open(file_translations_path) as file:
+
+def get_translation(status, number):
+    with open(file_path) as file:
         translations = json.load(file)
-else:
-    print(file_translations_path + " file is empty")
 
-
-# Helpers
-
-def create_response(status, trnsl_data):
     return Response(
-            status=status,
-            response=json.dumps(trnsl_data, ensure_ascii=False).encode('utf8'),
-            headers=Headers([('Content-Type', 'application/json')]))
+        status=status,
+        response=json.dumps(
+            translations[number], ensure_ascii=False).encode('utf8'),
+        headers=Headers([('Content-Type', 'application/json')]))
+
+# STATES FOR TESTING
 
 
-# Provider states for testing purposes
+STATES = ['translation for number 1', 'no translation for number -1']
 
-STATES = ['translation for number 1', 'translation for number -1 doesn\'t exist']
 
 def prepare_state(state):
 
-    translations_file = open(file_translations_path, 'w')
+    translations_file = open(file_path, 'w')
 
     def write_to_file(translation):
         translation_dump = json.dumps(translation, ensure_ascii=False)
         translations_file.write(translation_dump)
 
-    if (state == 'translation for number 1'):
+    if (state == STATES[0]):
         write_to_file(
-            {"1": {"ua": 'Один', "en": 'One'}})
+            {"1": {"de": 'eins', "en": 'one'}})
 
-    elif (state == 'translation for number -1 doesn\'t exist'):     
+    elif (state == STATES[1]):
         write_to_file(
-            {"153": {"ua": "Cто п'ятдесят три", "en": "One hundred fifty three"}})
+            {"4": {"de": "vier", "en": "fore"}})
 
     else:
         print("State {} is not implemented".format(state))
 
     translations_file.close()
 
-    global translations
 
-    with open(file_translations_path) as file:
-        translations = json.load(file)
+# APPLICATION ENDPOINTS
+app = Flask(__name__)
 
 
-# Application
-
-# - provider states, for testing purposes
-
-@app.route('/_pact/provider_states', methods=['GET','POST'])
+@app.route('/_pact/provider_states', methods=['GET', 'POST'])
 def states():
-    """This endpoint is an external endpoint for testing purposes. It's an example how
-    provider states can be implemented. 
-    
-    USAGE: python-verifier will send a request with the body:
-           JSON body {consumer: 'Consumer name', states: ['a thing exists']}
-           to this enpoint
-    """ 
+    """ USAGE: python-verifier will send a request with the body:
+               {consumer: 'Consumer name', states: ['a thing exists']}
+               to this enpoint. One state at the time is allowed.
+    """
     data = request.get_json()
     prepare_state(data["states"][0])
 
-    return STATUS['ok']  
+    return STATUS['ok']
 
-@app.route('/_pact/provider_states/all', methods=['GET','POST'])
-def all_states():
-    """ Get available provider states """
-    return create_response(200, STATES)
-
-# - main functionality
 
 @app.route('/translate/<number>', methods=['GET'])
 def translate_number(number):
     try:
-        return create_response(200, translations[number])
+        return get_translation(200, number)
     except KeyError:
         return STATUS['not_found']
 
